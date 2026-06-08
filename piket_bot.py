@@ -13,7 +13,7 @@ CHAT_ID = os.environ["CHAT_ID"]
 TUGAS_PIKET = [
     "Menyapu lantai & membuang sampah",
     "Merapikan lemari & Menyapu lantai",  # Tugas kedua sesuai kodemu
-    "Merapikan kursi taruna & mematikan AC/lampu",
+    "Merapikan meja, kursi taruna & mematikan AC/lampu",
 ]
 
 JADWAL_PIKET = {
