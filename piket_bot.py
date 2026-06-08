@@ -25,13 +25,13 @@ JADWAL_PIKET = {
 }
 
 HARI_ID = {
-    "Monday": "Senin",
-    "Tuesday": "Selasa",
-    "Wednesday": "Rabu",
-    "Thursday": "Kamis",
-    "Friday": "Jumat",
-    "Saturday": "Sabtu",
-    "Sunday": "Minggu",
+    "Monday": "📅 Senin",
+    "Tuesday": "📅 Selasa",
+    "Wednesday": "📅 Rabu",
+    "Thursday": "📅 Kamis",
+    "Friday": "📅 Jumat",
+    "Saturday": "📅 Sabtu",
+    "Sunday": "📅 Minggu",
 }
 
 # ============================================================
@@ -56,7 +56,7 @@ def format_pagi(hari_id: str, petugas: list) -> str:
     return (
         f"🧹 *REMINDER PIKET KELAS — {hari_id.upper()}*\n"
         f"━━━━━━━━━━━━━━━━\n"
-        f"Hari ini, kebersihan ruang kelas adalah tanggung jawab:\n\n"
+        f"👥 Hari ini, kebersihan ruang kelas adalah tanggung jawab:\n\n"
         f"{daftar}\n\n"
         f"_Taruna yang namanya diatas menentukan ke still-an kelas ini 🙏_"
     )
@@ -71,7 +71,7 @@ def format_siang(hari_id: str, petugas: list) -> str:
     return (
         f"🪭 *EKSEKUSI PIKET — {hari_id.upper()}*\n"
         f"━━━━━━━━━━━━━━━━\n"
-        f"Jam kuliah hampir selesai. Ini saatnya:\n\n"
+        f"👥 Jam kuliah hampir selesai. Ini saatnya:\n\n"
         f"• *{anggota_str}* — Laksanakan tugas masing-masing sekarang.\n"
         f"• *{DANPIKET}* — Pastikan standar 100% terpenuhi sebelum lapor ke Ketua Kelas.\n\n"
         f"_Terima kasih atas kesadaran dan tanggung jawabnya 🙏🙏_"
