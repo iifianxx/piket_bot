@@ -53,8 +53,9 @@ def format_pagi(hari_id: str, petugas: list) -> str:
     daftar = "\n".join(baris)
 
     return (
-        f"🧹 *REMINDER PIKET KELAS — {hari_id.upper()}*\n"
+        f"🧹 *REMINDER PIKET KELAS*\n"
         f"━━━━━━━━━━━━━━━━\n"
+        f"📅 Hari: *{hari_id}*\n\n"
         f"👥 Petugas piket hari ini:\n\n"
         f"{daftar}\n\n"
         f"_Mohon piket sebelum pelajaran dimulai. 🙏_"
@@ -71,9 +72,10 @@ def format_siang(hari_id: str, petugas: list) -> str:
     )
 
     return (
-        f"🧹 *REMINDER PIKET KELAS — {hari_id.upper()}*\n"
+        f"🧹 *REMINDER PIKET KELAS*\n"
         f"━━━━━━━━━━━━━━━━\n"
-        f"👥 Jam kuliah hampir selesai. Ini saatnya:\n\n"
+        f"📅 Hari: *{hari_id}*\n\n"
+        f"👥 Jam kuliah hampir selesai, Ini saatnya:\n\n"
         f"{baris_anggota}\n"
         f"• *{DANPIKET}* — Pastikan standar 100% terpenuhi sebelum lapor ke Ketua Kelas.\n\n"
         f"_Terima kasih atas kesadaran dan tanggung jawabnya. 🙏_"
