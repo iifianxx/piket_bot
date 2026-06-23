@@ -1,8 +1,8 @@
 import os
+import sys
 import time
 from datetime import datetime
 import requests
-import schedule
 
 # ============================================================
 # KONFIGURASI
@@ -13,7 +13,7 @@ CHAT_ID = os.environ.get("CHAT_ID")
 
 TUGAS_PIKET = [
     "Menyapu lantai & membuang sampah",
-    "Merapikan kabel & Menyapu lantai",  # Tugas kedua sesuai kodemu
+    "Merapikan kabel & Menyapu lantai",
     "Merapikan meja, kursi taruna & mematikan AC/lampu",
 ]
 
@@ -26,13 +26,8 @@ JADWAL_PIKET = {
 }
 
 HARI_ID = {
-    "Monday": "Senin",
-    "Tuesday": "Selasa",
-    "Wednesday": "Rabu",
-    "Thursday": "Kamis",
-    "Friday": "Jumat",
-    "Saturday": "Sabtu",
-    "Sunday": "Minggu",
+    "Monday": "Senin", "Tuesday": "Selasa", "Wednesday": "Rabu",
+    "Thursday": "Kamis", "Friday": "Jumat", "Saturday": "Sabtu", "Sunday": "Minggu",
 }
 
 # ============================================================
@@ -40,16 +35,12 @@ HARI_ID = {
 # ============================================================
 
 def format_pagi(hari_id: str, petugas: list) -> str:
-    """Pagi: identity anchor + implementation intention."""
     baris = []
     for i, nama in enumerate(petugas):
         if i < len(TUGAS_PIKET):
             baris.append(f"• *{nama.upper()}* ➔ {TUGAS_PIKET[i]}")
         else:
-            # MEMBAGI JADI 2 BARIS: Menggunakan \n dan spasi tak terlihat agar sejajar bawahnya
-            baris.append(
-                f"• *{nama.upper()}* ➔ Danpiket — Lapor ke Ketua Kelas setelah selesai\n"
-            )
+            baris.append(f"• *{nama.upper()}* ➔ Danpiket — Lapor ke Ketua Kelas setelah selesai\n")
     daftar = "\n".join(baris)
 
     return (
@@ -66,8 +57,7 @@ def format_siang(hari_id: str, petugas: list) -> str:
     DANPIKET = petugas[-1].upper()
 
     baris_anggota = "\n".join(
-        f"• *{nama.upper()}* — {tugas}"
-        for nama, tugas in zip(anggota, TUGAS_PIKET)
+        f"• *{nama.upper()}* — {tugas}" for nama, tugas in zip(anggota, TUGAS_PIKET)
     )
 
     return (
@@ -88,10 +78,6 @@ def now() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 def kirim_pesan(teks: str):
-    if not BOT_TOKEN or not CHAT_ID:
-        print(f"[{now()}] ERROR: BOT_TOKEN atau CHAT_ID tidak ditemukan di environment.")
-        return
-
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     payload = {"chat_id": CHAT_ID, "text": teks, "parse_mode": "Markdown"}
     try:
@@ -100,13 +86,11 @@ def kirim_pesan(teks: str):
         if data.get("ok"):
             print(f"[{now()}] Pesan berhasil dikirim.")
         else:
-            print(f"[{now()}] ERROR API: {data.get('description')}")
+            print(f"[{now()}] ERROR: {data.get('description')}")
     except requests.exceptions.RequestException as e:
         print(f"[{now()}] Koneksi gagal: {e}")
 
 def kirim_reminder_piket(mode: str):
-    # Mengambil hari dari server (Railway menggunakan UTC)
-    # Karena 00:40 UTC dan 08:15 UTC tidak menyeberang hari dari WIB, harinya tetap akurat.
     hari_en = datetime.now().strftime("%A")
     hari_id = HARI_ID.get(hari_en, hari_en)
 
@@ -121,40 +105,32 @@ def kirim_reminder_piket(mode: str):
     else:
         pesan = format_pagi(hari_id, petugas)
 
-    print(f"[{now()}] Mengeksekusi mode {mode} untuk {hari_id}...")
     kirim_pesan(pesan)
 
-# Wrapper function untuk scheduler
-def job_pagi():
-    kirim_reminder_piket("pagi")
-
-def job_siang():
-    kirim_reminder_piket("siang")
+def sinkronisasi_waktu(target_jam_utc: int, target_menit_utc: int):
+    """Menahan eksekusi sampai detik jam server menyentuh target secara presisi."""
+    print(f"[{now()}] Container menyala. Menunggu waktu presisi {target_jam_utc:02d}:{target_menit_utc:02d} UTC...")
+    while True:
+        sekarang = datetime.now()
+        # Jika waktu server sudah mencapai atau melewati waktu target, lepaskan penahan!
+        if sekarang.hour == target_jam_utc and sekarang.minute >= target_menit_utc:
+            print(f"[{now()}] Waktu target tercapai! Mengeksekusi pesan...")
+            break
+        time.sleep(1) # Tahan dan cek lagi setiap 1 detik
 
 # ============================================================
-# ENTRY POINT (DAEMON/ALWAYS-ON)
+# ENTRY POINT
 # ============================================================
 
 if __name__ == "__main__":
-    print(f"[{now()}] Sistem bot diinisialisasi (Mode Always-On).")
+    mode = sys.argv[1] if len(sys.argv) > 1 else "pagi"
     
-    # Jadwal Pagi: 07:40 WIB = 00:40 UTC
-    jadwal_pagi_utc = "00:40"
-    for hari in [schedule.every().monday, schedule.every().tuesday, 
-                 schedule.every().wednesday, schedule.every().thursday, 
-                 schedule.every().friday]:
-        hari.at(jadwal_pagi_utc).do(job_pagi)
+    # Kunci eksekusi berdasarkan mode (Target dalam UTC)
+    if mode == "pagi":
+        # Target pengiriman: 07:40 WIB -> 00:40 UTC
+        sinkronisasi_waktu(0, 40)
+    elif mode == "siang":
+        # Target pengiriman: 15:15 WIB -> 08:15 UTC
+        sinkronisasi_waktu(8, 15)
 
-    # Jadwal Siang: 15:15 WIB = 08:15 UTC
-    jadwal_siang_utc = "08:15"
-    for hari in [schedule.every().monday, schedule.every().tuesday, 
-                 schedule.every().wednesday, schedule.every().thursday, 
-                 schedule.every().friday]:
-        hari.at(jadwal_siang_utc).do(job_siang)
-
-    print(f"[{now()}] Jadwal diaktifkan. Pagi: {jadwal_pagi_utc} UTC, Siang: {jadwal_siang_utc} UTC.")
-    
-    # Looping abadi agar container tidak mati
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    kirim_reminder_piket(mode)
