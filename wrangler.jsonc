@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "piket-bot",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-13",
+  "observability": {
+    "enabled": true
+  },
+  "triggers": {
+    "crons": [
+      "40 0 * * MON-FRI",
+      "15 8 * * MON-FRI"
+    ]
+  }
+}
