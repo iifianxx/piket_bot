@@ -58,7 +58,7 @@ function buatDaftarTugas(namaPiket, mode) {
   return TUGAS_PIKET.map((tugas, index) => {
     // Jika hanya dua petugas, keempat tugas dibagi bergantian.
     const nama = namaPiket[index % namaPiket.length].toUpperCase();
-    const pemisah = mode === "pagi" ? "➜" : "—";
+    const pemisah = mode === "pagi" ? "➔" : "—";
 
     return `• <b>${escapeHtml(nama)}</b> ${pemisah} ${tugas}`;
   }).join("\n");
@@ -103,7 +103,7 @@ function buatPesanSiang(hari, namaPiket) {
     "━━━━━━━━━━━━━━━━━━━━",
     `📅 Hari: <b>${hariIndonesia}</b>`,
     "",
-    "👥 Jam kuliah hampir selesai, Ini saatnya:",
+    "👥 Jam kuliah hampir selesai, ini saatnya:",
     "",
     daftarTugas,
     "",
